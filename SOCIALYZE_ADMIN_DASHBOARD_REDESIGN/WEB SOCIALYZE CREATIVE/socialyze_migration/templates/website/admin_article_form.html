@@ -1,0 +1,793 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ page_title }} — Socialyze</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'website/style.css' %}">
+
+    <style>
+        .article-editor-page {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .article-editor-page .editor-heading {
+            margin-bottom: 30px;
+        }
+
+        .article-editor-page .editor-eyebrow {
+            color: #6b0b0d;
+            font: 500 11px 'DM Mono', monospace;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .article-editor-page .editor-heading h1 {
+            color: #430709;
+            font-size: clamp(30px, 4vw, 48px);
+            line-height: 1.1;
+            margin: 0 0 10px;
+        }
+
+        .article-editor-page .editor-heading p {
+            color: #8b756c;
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .article-editor-page .editor-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6b0b0d;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .article-editor-page .editor-back:hover {
+            text-decoration: underline;
+        }
+
+        .article-editor-page .editor-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .article-editor-page .editor-panel {
+            background: #fff8ca;
+            border: 1px solid #e8dcae;
+            border-radius: 14px;
+            padding: 25px;
+            min-width: 0;
+        }
+
+        .article-editor-page .editor-panel + .editor-panel {
+            margin-top: 18px;
+        }
+
+        .article-editor-page .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .article-editor-page .panel-heading h2 {
+            color: #430709;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .article-editor-page .panel-heading p {
+            color: #927c70;
+            font-size: 12px;
+            margin: 5px 0 0;
+        }
+
+        .article-editor-page .editor-number {
+            display: grid;
+            place-items: center;
+            width: 34px;
+            height: 34px;
+            flex: 0 0 34px;
+            border-radius: 50%;
+            background: #d5de85;
+            color: #430709;
+            font: 500 12px 'DM Mono', monospace;
+        }
+
+        .article-editor-page .field-group {
+            margin-bottom: 21px;
+            min-width: 0;
+        }
+
+        .article-editor-page .field-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .article-editor-page .field-group label {
+            display: block;
+            color: #430709;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .article-editor-page .field-help {
+            color: #927c70;
+            font-size: 12px;
+            margin-top: 7px;
+            line-height: 1.5;
+        }
+
+        .article-editor-page .field-group input:not([type="checkbox"]):not([type="file"]),
+        .article-editor-page .field-group textarea,
+        .article-editor-page .field-group select {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            min-height: 48px;
+            box-sizing: border-box;
+            border: 1px solid #dfd2a8;
+            border-radius: 8px;
+            padding: 12px 14px;
+            background: #fffdf3;
+            color: #430709;
+            font: 14px 'Space Grotesk', sans-serif;
+            outline: none;
+        }
+
+        .article-editor-page .field-group textarea {
+            min-height: 105px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        .article-editor-page .field-group input:focus,
+        .article-editor-page .field-group textarea:focus,
+        .article-editor-page .field-group select:focus {
+            border-color: #6b0b0d;
+            box-shadow: 0 0 0 3px rgba(107, 11, 13, .08);
+        }
+
+        .article-editor-page .field-group input[type="file"] {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            background: #fffdf3;
+            border: 1px solid #dfd2a8;
+            border-radius: 8px;
+            color: #6b0b0d;
+        }
+
+        .article-editor-page .editor-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px;
+            background: #f1e8c8;
+            border: 1px solid #dfd2a8;
+            border-bottom: 0;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .article-editor-page .editor-toolbar button {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 9px;
+            border: 1px solid #d9cba2;
+            border-radius: 5px;
+            background: #fff8ca;
+            color: #6b0b0d;
+            font: 600 12px 'Space Grotesk', sans-serif;
+            cursor: pointer;
+        }
+
+        .article-editor-page .editor-toolbar button:hover {
+            background: #d5de85;
+        }
+
+        .article-editor-page textarea.article-editor {
+            min-height: 350px;
+            border-radius: 0 0 8px 8px;
+            font-family: monospace;
+            line-height: 1.7;
+        }
+
+        .article-editor-page .image-preview {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 9px;
+            border: 1px solid #dfd2a8;
+            margin-top: 12px;
+            background: #f1e8c8;
+        }
+
+        .article-editor-page .image-preview[hidden] {
+            display: none;
+        }
+
+        .article-editor-page .current-image {
+            display: block;
+            width: 100%;
+            max-height: 190px;
+            object-fit: cover;
+            border-radius: 9px;
+            margin: 12px 0;
+        }
+
+        .article-editor-page .errorlist {
+            color: #a21b1b;
+            font-size: 12px;
+            padding-left: 18px;
+            margin: 7px 0 0;
+        }
+
+        .article-editor-page .form-errors {
+            padding: 13px 16px;
+            border: 1px solid #d99a91;
+            border-radius: 8px;
+            color: #8b1717;
+            background: #fff0e9;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .article-editor-page .editor-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .article-editor-page .action-left,
+        .article-editor-page .action-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .article-editor-page .editor-button {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 44px;
+            padding: 0 19px;
+            border: 1px solid #6b0b0d;
+            border-radius: 7px;
+            background: #6b0b0d;
+            color: #fff8ca;
+            font: 600 13px 'Space Grotesk', sans-serif;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .article-editor-page .editor-button:hover {
+            background: #430709;
+        }
+
+        .article-editor-page .editor-button.secondary {
+            background: transparent;
+            color: #6b0b0d;
+        }
+
+        .article-editor-page .editor-button.secondary:hover {
+            background: #f1e8c8;
+        }
+
+        .article-editor-page .editor-note {
+            color: #927c70;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .article-editor-page .editor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-editor-page .editor-sidebar {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 15px;
+            }
+
+            .article-editor-page .editor-sidebar .editor-panel {
+                margin-top: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .article-editor-page .editor-panel {
+                padding: 17px;
+            }
+
+            .article-editor-page .editor-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .article-editor-page .editor-actions {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .article-editor-page .action-left,
+            .article-editor-page .action-right {
+                width: 100%;
+            }
+
+            .article-editor-page .editor-button {
+                flex: 1;
+            }
+
+            .article-editor-page textarea.article-editor {
+                min-height: 260px;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-page">
+
+<div class="admin-shell">
+
+    <aside class="admin-sidebar" id="adminSidebar">
+
+        <a class="admin-brand" href="{% url 'dashboard' %}">
+            <img src="{% static 'website/images/logo.png' %}" alt="Socialyze">
+            <span>
+                <strong>SOCIALYZE</strong>
+                <small>CREATIVE ADMIN</small>
+            </span>
+        </a>
+
+        <div class="admin-side-label">OVERVIEW</div>
+
+        <nav class="admin-nav" aria-label="Navigasi admin">
+
+            <a class="admin-nav-link" href="{% url 'dashboard' %}">
+                <span class="admin-nav-icon">▦</span>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="admin-side-label">CONTENT MANAGEMENT</div>
+
+            <a class="admin-nav-link active" href="{% url 'admin_articles' %}">
+                <span class="admin-nav-icon">▤</span>
+                <span>Kelola Artikel</span>
+            </a>
+
+            <a class="admin-nav-link" href="{% url 'admin_services' %}">
+                <span class="admin-nav-icon">✳</span>
+                <span>Kelola Layanan</span>
+            </a>
+
+            <div class="admin-side-label">ACCOUNT</div>
+
+            <a class="admin-nav-link" href="{% url 'admin_profile' %}">
+                <span class="admin-nav-icon">◉</span>
+                <span>Pengaturan Akun</span>
+            </a>
+
+            <a class="admin-nav-link" href="{% url 'home' %}" target="_blank" rel="noopener">
+                <span class="admin-nav-icon">↗</span>
+                <span>Lihat Website</span>
+            </a>
+
+        </nav>
+
+        <div class="admin-sidebar-bottom">
+
+            <div class="admin-user-chip">
+                <span class="admin-avatar">{{ request.user.username|slice:":1"|upper }}</span>
+                <span>
+                    <b>{{ request.user.username }}</b>
+                    <small>Administrator</small>
+                </span>
+            </div>
+
+            <form method="post" action="{% url 'staff_logout' %}">
+                {% csrf_token %}
+                <button class="admin-logout" type="submit">
+                    <span>↪</span> Logout
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <main class="admin-main">
+
+        <header class="admin-topbar">
+
+            <button class="admin-mobile-toggle"
+                    id="adminMenuToggle"
+                    type="button"
+                    aria-label="Buka menu"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="admin-breadcrumb">
+                SOCIALYZE <span>/</span> CONTENT <span>/</span> ARTICLE EDITOR
+            </div>
+
+            <a class="admin-view-site"
+               href="{% url 'home' %}"
+               target="_blank"
+               rel="noopener">
+                Lihat website ↗
+            </a>
+
+        </header>
+
+        <div class="admin-content-wrap article-editor-page">
+
+            {% if messages %}
+                <div class="admin-alerts">
+                    {% for message in messages %}
+                        <div class="admin-alert {{ message.tags|default:'info' }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <a href="{% url 'admin_articles' %}" class="editor-back">
+                ← Kembali ke Kelola Artikel
+            </a>
+
+            <section class="editor-heading">
+                <p class="editor-eyebrow">SOCIALYZE / CONTENT STUDIO</p>
+                <h1>{{ page_title }}</h1>
+                <p>Susun ide, bagikan wawasan, dan ceritakan perspektif baru bersama Socialyze.</p>
+            </section>
+
+            <form method="post"
+                  enctype="multipart/form-data"
+                  id="articleForm">
+
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="editor-grid">
+
+                    <!-- KOLOM KIRI: KONTEN ARTIKEL -->
+                    <section class="editor-panel">
+
+                        <div class="panel-heading">
+                            <div>
+                                <h2>Konten Artikel</h2>
+                                <p>Judul, ringkasan, dan isi tulisan.</p>
+                            </div>
+                            <span class="editor-number">01</span>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.title.id_for_label }}">Judul Artikel *</label>
+                            {{ form.title }}
+                            {{ form.title.errors }}
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.excerpt.id_for_label }}">Ringkasan Artikel *</label>
+                            {{ form.excerpt }}
+                            {{ form.excerpt.errors }}
+                            <p class="field-help">Ringkasan ini akan tampil pada kartu artikel di halaman website.</p>
+                        </div>
+
+                        <div class="field-group">
+                            <label for="{{ form.body.id_for_label }}">Isi Lengkap Artikel *</label>
+
+                            <div class="editor-toolbar">
+                                <button type="button" data-tag="h2">H2</button>
+                                <button type="button" data-tag="h3">H3</button>
+                                <button type="button" data-tag="strong"><b>B</b></button>
+                                <button type="button" data-tag="em"><i>I</i></button>
+                                <button type="button" data-tag="u"><u>U</u></button>
+                                <button type="button" data-tag="blockquote">Quote</button>
+                                <button type="button" data-tag="ul">• List</button>
+                                <button type="button" data-tag="ol">1. List</button>
+                                <button type="button" id="insertLink">↗ Link</button>
+                            </div>
+
+                            {{ form.body }}
+                            {{ form.body.errors }}
+
+                            <p class="field-help">
+                                Pilih teks yang ingin diformat, kemudian klik tombol editor.
+                                Kamu juga bisa menulis HTML sederhana menggunakan format yang didukung.
+                            </p>
+                        </div>
+
+                    </section>
+
+                    <!-- KOLOM KANAN: PENGATURAN -->
+                    <div class="editor-sidebar">
+
+                        <section class="editor-panel">
+
+                            <div class="panel-heading">
+                                <div>
+                                    <h2>Thumbnail</h2>
+                                    <p>Gambar utama artikel.</p>
+                                </div>
+                                <span class="editor-number">02</span>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="{{ form.uploaded_image.id_for_label }}">Upload Thumbnail</label>
+
+                                {% if form.instance.uploaded_image %}
+                                    <img
+                                        src="{{ form.instance.uploaded_image.url }}"
+                                        class="current-image"
+                                        alt="Thumbnail saat ini"
+                                    >
+                                    <p class="field-help">Upload gambar baru jika ingin mengganti thumbnail.</p>
+                                {% endif %}
+
+                                {{ form.uploaded_image }}
+                                {{ form.uploaded_image.errors }}
+
+                                <img id="imagePreview"
+                                     class="image-preview"
+                                     alt="Preview thumbnail"
+                                     hidden>
+
+                                <p class="field-help">Format gambar: JPG, PNG, atau WEBP. Maksimal 5 MB.</p>
+                            </div>
+
+                        </section>
+
+                        <section class="editor-panel">
+
+                            <div class="panel-heading">
+                                <div>
+                                    <h2>Informasi Artikel</h2>
+                                    <p>Kategori dan identitas penulis.</p>
+                                </div>
+                                <span class="editor-number">03</span>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="{{ form.category.id_for_label }}">Kategori</label>
+                                {{ form.category }}
+                                {{ form.category.errors }}
+                            </div>
+
+                            <div class="field-group">
+                                <label for="{{ form.author.id_for_label }}">Nama Penulis</label>
+                                {{ form.author }}
+                                {{ form.author.errors }}
+                            </div>
+
+                            <div class="field-group">
+                                <label for="{{ form.published_at.id_for_label }}">Tanggal Publikasi</label>
+                                {{ form.published_at }}
+                                {{ form.published_at.errors }}
+                                <p class="field-help">Boleh dikosongkan. Sistem akan mengisi tanggal otomatis saat artikel diterbitkan.</p>
+                            </div>
+
+                        </section>
+
+                        <section class="editor-panel">
+
+                            <div class="panel-heading">
+                                <div>
+                                    <h2>Status Publikasi</h2>
+                                    <p>Tentukan status artikel.</p>
+                                </div>
+                                <span class="editor-number">04</span>
+                            </div>
+
+                            <div class="field-group">
+                                <label for="{{ form.status.id_for_label }}">Status Artikel</label>
+                                {{ form.status }}
+                                {{ form.status.errors }}
+                                <p class="field-help">
+                                    Draft tidak akan ditampilkan kepada pengunjung.
+                                    Published akan ditampilkan di website.
+                                </p>
+                            </div>
+
+                        </section>
+
+                    </div>
+
+                </div>
+
+                <div class="editor-actions">
+
+                    <div class="action-left">
+                        <a href="{% url 'admin_articles' %}" class="editor-button secondary">
+                            Batal
+                        </a>
+
+                        {% if is_edit %}
+                            <a href="{% url 'admin_article_preview' article.id %}"
+                               class="editor-button secondary"
+                               target="_blank">
+                                Preview Artikel ↗
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="action-right">
+                        <button type="submit" class="editor-button">
+                            {{ button_text }}
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <p class="editor-note">
+                SOCIALYZE CREATIVE — CONTENT MANAGEMENT STUDIO
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+
+<div class="admin-sidebar-scrim" id="adminSidebarScrim"></div>
+
+<script>
+(() => {
+    const sidebar = document.getElementById('adminSidebar');
+    const toggle = document.getElementById('adminMenuToggle');
+    const scrim = document.getElementById('adminSidebarScrim');
+
+    function closeMenu() {
+        if (sidebar) sidebar.classList.remove('is-open');
+        if (scrim) scrim.classList.remove('is-visible');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    if (toggle && sidebar) {
+        toggle.addEventListener('click', () => {
+            const opened = sidebar.classList.toggle('is-open');
+
+            if (scrim) {
+                scrim.classList.toggle('is-visible', opened);
+            }
+
+            toggle.setAttribute('aria-expanded', String(opened));
+        });
+    }
+
+    if (scrim) {
+        scrim.addEventListener('click', closeMenu);
+    }
+
+    const bodyField = document.getElementById('{{ form.body.id_for_label }}');
+
+    function insertTag(tag) {
+        if (!bodyField) return;
+
+        const start = bodyField.selectionStart;
+        const end = bodyField.selectionEnd;
+        const selected = bodyField.value.substring(start, end);
+        const before = bodyField.value.substring(0, start);
+        const after = bodyField.value.substring(end);
+
+        let replacement = '';
+
+        if (tag === 'ul' || tag === 'ol') {
+            const items = selected || 'Tulis poin di sini';
+            const listItems = items.split('\n')
+                .filter(item => item.trim())
+                .map(item => '<li>' + item.trim() + '</li>')
+                .join('\n');
+
+            replacement = '<' + tag + '>\n' +
+                (listItems || '<li>Tulis poin di sini</li>') +
+                '\n</' + tag + '>';
+        } else {
+            const content = selected || 'Tulis teks di sini';
+            replacement = '<' + tag + '>' + content + '</' + tag + '>';
+        }
+
+        bodyField.value = before + replacement + after;
+        bodyField.focus();
+
+        const cursor = before.length + replacement.length;
+        bodyField.setSelectionRange(cursor, cursor);
+    }
+
+    document.querySelectorAll('.editor-toolbar [data-tag]').forEach(button => {
+        button.addEventListener('click', () => {
+            insertTag(button.dataset.tag);
+        });
+    });
+
+    const linkButton = document.getElementById('insertLink');
+
+    if (linkButton && bodyField) {
+        linkButton.addEventListener('click', () => {
+            const url = prompt('Masukkan URL tautan (https://...)');
+
+            if (!url) return;
+
+            if (!/^https?:\/\//i.test(url)) {
+                alert('URL harus diawali http:// atau https://');
+                return;
+            }
+
+            const start = bodyField.selectionStart;
+            const end = bodyField.selectionEnd;
+            const selected = bodyField.value.substring(start, end) || 'Teks tautan';
+            const before = bodyField.value.substring(0, start);
+            const after = bodyField.value.substring(end);
+
+            const replacement = '<a href="' + url + '">' +
+                selected + '</a>';
+
+            bodyField.value = before + replacement + after;
+            bodyField.focus();
+        });
+    }
+
+    const imageInput = document.getElementById('{{ form.uploaded_image.id_for_label }}');
+    const imagePreview = document.getElementById('imagePreview');
+
+    if (imageInput && imagePreview) {
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+
+            if (!file) {
+                imagePreview.hidden = true;
+                imagePreview.removeAttribute('src');
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                alert('File harus berupa gambar.');
+                imageInput.value = '';
+                imagePreview.hidden = true;
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Ukuran gambar maksimal 5 MB.');
+                imageInput.value = '';
+                imagePreview.hidden = true;
+                return;
+            }
+
+            imagePreview.src = URL.createObjectURL(file);
+            imagePreview.hidden = false;
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

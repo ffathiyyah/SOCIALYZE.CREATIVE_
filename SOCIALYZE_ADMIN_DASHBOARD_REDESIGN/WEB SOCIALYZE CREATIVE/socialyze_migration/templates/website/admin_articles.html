@@ -1,0 +1,442 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Artikel — Socialyze</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 35px;
+            font-family: 'Space Grotesk', sans-serif;
+            background: #f7f0d2;
+            color: #430709;
+        }
+
+        .container { max-width: 1150px; margin: auto; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        h1 { margin: 0 0 8px; font-size: 32px; }
+        h2 { margin-top: 0; font-size: 22px; }
+
+        .muted { color: #806b62; margin: 0; }
+
+        .button {
+            display: inline-block;
+            padding: 12px 18px;
+            background: #6b0b0d;
+            color: white;
+            text-decoration: none;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .button:hover { background: #430709; }
+
+        .button-green { background: #68752c; }
+        .button-green:hover { background: #4d591d; }
+
+        .button-light {
+            background: #e9dfbd;
+            color: #430709;
+        }
+
+        .button-light:hover { background: #dfd1a6; }
+
+        .panel {
+            background: #fff8ca;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e4d8a9;
+            margin-bottom: 25px;
+        }
+
+        .count { margin-bottom: 20px; font-weight: 600; }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label { font-size: 14px; font-weight: 600; }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d8cba0;
+            border-radius: 6px;
+            background: #fffdf0;
+            color: #430709;
+            font: inherit;
+            outline: none;
+        }
+
+        input:focus { border-color: #6b0b0d; }
+
+        .help {
+            font-size: 13px;
+            color: #806b62;
+            line-height: 1.6;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message {
+            padding: 13px 16px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            background: #e8efd8;
+            color: #31502b;
+        }
+
+        .message.error {
+            background: #f8dddd;
+            color: #8a1717;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 950px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 10px;
+            border-bottom: 1px solid #e4d8a9;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        th {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #e9dfbd;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .status.published {
+            background: #dce9ca;
+            color: #31502b;
+        }
+
+        .status.draft {
+            background: #f4dfbd;
+            color: #80521e;
+        }
+
+        .source-link {
+            color: #6b0b0d;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .source-link:hover { text-decoration: underline; }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .action-link {
+            display: inline-block;
+            padding: 7px 10px;
+            border-radius: 5px;
+            background: #e9dfbd;
+            color: #430709;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .action-link:hover { background: #dfd1a6; }
+
+        .delete-button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 5px;
+            background: #8a1717;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .delete-button:hover { background: #430709; }
+
+        .inline-form { display: inline; }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #806b62;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .section-heading h2 { margin-bottom: 5px; }
+
+        @media(max-width: 650px) {
+            body { padding: 18px; }
+            h1 { font-size: 25px; }
+            .panel { padding: 18px; }
+            .topbar .button { width: 100%; text-align: center; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1>Kelola Artikel</h1>
+            <p class="muted">
+                Kelola artikel eksternal dan artikel yang dibuat langsung di Socialyze.
+            </p>
+        </div>
+
+        <a href="{% url 'dashboard' %}" class="button">
+            ← Kembali ke Dashboard
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags == 'error' %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- ARTIKEL BUATAN SENDIRI -->
+    <section class="panel">
+        <div class="section-heading">
+            <div>
+                <h2>Buat Artikel Sendiri</h2>
+                <p class="muted">
+                    Tulis dan publikasikan artikel langsung melalui dashboard Socialyze.
+                </p>
+            </div>
+
+            <a href="{% url 'admin_article_create' %}" class="button button-green">
+                + Tulis Artikel Baru
+            </a>
+        </div>
+
+        <p class="help">
+            Kamu dapat menambahkan thumbnail, kategori, ringkasan, isi artikel,
+            penulis, tanggal publikasi, serta menyimpan artikel sebagai draft
+            sebelum diterbitkan.
+        </p>
+    </section>
+
+    <!-- IMPOR ARTIKEL EKSTERNAL -->
+    <section class="panel">
+        <h2>Tambah Artikel Eksternal</h2>
+        <p class="muted">
+            Tempelkan link artikel. Sistem akan mencoba mengambil informasi artikelnya secara otomatis.
+        </p>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="field" style="margin-top: 22px;">
+                <label for="source_url">Link Artikel *</label>
+                <input
+                    type="url"
+                    id="source_url"
+                    name="source_url"
+                    placeholder="https://contoh.com/artikel"
+                    maxlength="1000"
+                    required
+                >
+                <span class="help">
+                    Masukkan URL halaman artikel yang ingin ditampilkan.
+                    Judul, gambar, dan deskripsi akan diambil dari metadata halaman jika tersedia.
+                </span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button">
+                    + Ambil dan Simpan Artikel
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- DAFTAR ARTIKEL -->
+    <section class="panel">
+        <div class="count">
+            Total Artikel: {{ total_articles }}
+        </div>
+
+        <h2>Daftar Artikel</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>JUDUL ARTIKEL</th>
+                        <th>JENIS</th>
+                        <th>STATUS</th>
+                        <th>TANGGAL</th>
+                        <th>AKSI</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for article in articles %}
+                    <tr>
+                        <td>
+                            <strong>{{ article.title }}</strong>
+                            {% if article.category %}
+                                <br>
+                                <span class="help">{{ article.category.name }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if article.source_url %}
+                                <span class="status">Eksternal</span>
+                            {% else %}
+                                <span class="status">Artikel Socialyze</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <span class="status {% if article.status == 'published' %}published{% else %}draft{% endif %}">
+                                {% if article.status == 'published' %}
+                                    Published
+                                {% else %}
+                                    Draft
+                                {% endif %}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if article.published_at %}
+                                {{ article.published_at|date:"d M Y" }}
+                            {% else %}
+                                {{ article.created_at|date:"d M Y" }}
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <div class="action-group">
+
+                                {% if article.source_url %}
+                                    <a href="{{ article.source_url }}"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="action-link">
+                                        Sumber ↗
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'admin_article_preview' article.id %}"
+                                       target="_blank"
+                                       class="action-link">
+                                        Preview
+                                    </a>
+
+                                    <a href="{% url 'admin_article_edit' article.id %}"
+                                       class="action-link">
+                                        Edit
+                                    </a>
+
+                                    {% if article.status == 'published' %}
+                                        <form method="POST"
+                                              action="{% url 'admin_article_unpublish' article.id %}"
+                                              class="inline-form"
+                                              onsubmit="return confirm('Jadikan artikel ini sebagai draft?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-link">
+                                                Jadikan Draft
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form method="POST"
+                                              action="{% url 'admin_article_publish' article.id %}"
+                                              class="inline-form"
+                                              onsubmit="return confirm('Terbitkan artikel ini?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-link">
+                                                Publish
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+
+                                <form method="POST"
+                                      action="{% url 'admin_article_delete' article.id %}"
+                                      class="inline-form"
+                                      onsubmit="return confirm('Yakin ingin menghapus artikel ini?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-button">
+                                        Hapus
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="empty">
+                            Belum ada artikel. Silakan tambahkan artikel pertama.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+</body>
+</html>

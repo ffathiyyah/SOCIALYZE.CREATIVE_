@@ -1,0 +1,111 @@
+
+{% extends 'website/auth_base.html' %}
+{% load static %}
+
+{% block content %}
+
+<section class="articles-hero">
+    <div class="hero-container">
+        <span class="hero-category">SOCIALYZE / INSIGHTS & STORIES</span>
+        <h1>Ideas worth sharing.</h1>
+        <p>
+            Temukan informasi, inspirasi, dan insight seputar branding,
+            kreativitas, serta perkembangan dunia digital.
+        </p>
+    </div>
+</section>
+
+<main class="main-content">
+    <div class="section-header">
+        <h2 class="section-title">Latest Articles</h2>
+        <span class="article-count">
+            {{ articles|length }} ARTICLES
+        </span>
+    </div>
+
+    <div class="articles-grid">
+
+        {% for article in articles %}
+
+            {% if article.source_url %}
+                <a href="{{ article.source_url }}"
+                   class="article-card"
+                   target="_blank"
+                   rel="noopener noreferrer">
+            {% else %}
+                <a href="{% url 'public_article_detail' article.slug %}"
+                   class="article-card">
+            {% endif %}
+
+                {% if article.uploaded_image %}
+                    <img
+                        src="{{ article.uploaded_image.url }}"
+                        alt="{{ article.title }}"
+                        class="article-image"
+                    >
+                {% elif article.image %}
+                    <img
+                        src="{{ article.image }}"
+                        alt="{{ article.title }}"
+                        class="article-image"
+                    >
+                {% else %}
+                    <img
+                        src="{% static 'website/images/porto-1.jpg' %}"
+                        alt="{{ article.title }}"
+                        class="article-image"
+                    >
+                {% endif %}
+
+                <div class="article-body">
+
+                    {% if article.category %}
+                        <span class="article-category">
+                            {{ article.category.name }}
+                        </span>
+                    {% endif %}
+
+                    <h3 class="article-card-title">
+                        {{ article.title }}
+                    </h3>
+
+                    <p class="article-card-excerpt">
+                        {% if article.excerpt %}
+                            {{ article.excerpt|truncatewords:20 }}
+                        {% else %}
+                            {{ article.body|striptags|truncatewords:20 }}
+                        {% endif %}
+                    </p>
+
+                    <div class="article-card-meta">
+                        <span>
+                            {% if article.published_at %}
+                                {{ article.published_at|date:"d M Y" }}
+                            {% else %}
+                                {{ article.created_at|date:"d M Y" }}
+                            {% endif %}
+                        </span>
+
+                        <span>
+                            By {{ article.author|default:"Socialyze Team" }}
+                        </span>
+                    </div>
+
+                </div>
+            </a>
+
+        {% empty %}
+
+            <div class="article-empty">
+                <h3>Belum Ada Artikel</h3>
+                <p>
+                    Artikel terbaru dari Socialyze akan ditampilkan di sini.
+                </p>
+            </div>
+
+        {% endfor %}
+
+    </div>
+</main>
+
+{% endblock %}

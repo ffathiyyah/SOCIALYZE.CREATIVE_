@@ -1,0 +1,239 @@
+
+{% extends 'website/auth_base.html' %}
+{% load static %}
+
+{% block content %}
+
+<style>
+    .article-detail-page {
+        background: #f7f0d2;
+        color: #430709;
+        min-height: 100vh;
+        padding: 65px 20px 90px;
+    }
+
+    .article-detail-container {
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .article-back {
+        display: inline-block;
+        color: #6b0b0d;
+        text-decoration: none;
+        font-weight: 600;
+        margin-bottom: 35px;
+    }
+
+    .article-back:hover {
+        text-decoration: underline;
+    }
+
+    .article-detail-category {
+        font-family: monospace;
+        font-size: 12px;
+        letter-spacing: 2px;
+        color: #806b62;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+    }
+
+    .article-detail-title {
+        font-size: clamp(34px, 6vw, 58px);
+        line-height: 1.12;
+        letter-spacing: -2px;
+        margin: 0 0 25px;
+        color: #430709;
+        overflow-wrap: anywhere;
+    }
+
+    .article-detail-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        font-size: 13px;
+        color: #806b62;
+        margin-bottom: 30px;
+    }
+
+    .article-detail-image {
+        width: 100%;
+        max-height: 500px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 35px;
+        display: block;
+    }
+
+    .article-detail-excerpt {
+        font-size: 19px;
+        line-height: 1.8;
+        font-weight: 500;
+        border-left: 4px solid #9aa85b;
+        padding-left: 20px;
+        margin-bottom: 35px;
+    }
+
+    .article-detail-body {
+        font-size: 16px;
+        line-height: 1.9;
+        color: #51413b;
+        overflow-wrap: anywhere;
+    }
+
+    .article-detail-body p {
+        margin: 0 0 22px;
+    }
+
+    .article-detail-body h2 {
+        font-size: 30px;
+        line-height: 1.3;
+        color: #430709;
+        margin: 40px 0 18px;
+    }
+
+    .article-detail-body h3,
+    .article-detail-body h4 {
+        color: #430709;
+        margin: 30px 0 14px;
+    }
+
+    .article-detail-body ul,
+    .article-detail-body ol {
+        padding-left: 25px;
+        margin-bottom: 22px;
+    }
+
+    .article-detail-body li {
+        margin-bottom: 9px;
+    }
+
+    .article-detail-body a {
+        color: #6b0b0d;
+        text-decoration: underline;
+        font-weight: 600;
+    }
+
+    .article-detail-body blockquote {
+        border-left: 4px solid #9aa85b;
+        padding: 10px 20px;
+        margin: 25px 0;
+        background: #fff8ca;
+        border-radius: 0 8px 8px 0;
+    }
+
+    .article-detail-footer {
+        border-top: 1px solid #dfd1a6;
+        margin-top: 55px;
+        padding-top: 25px;
+    }
+
+    .article-detail-footer a {
+        color: #6b0b0d;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .article-detail-preview {
+        background: #fff0bd;
+        border: 1px solid #d8bd72;
+        padding: 13px 16px;
+        border-radius: 7px;
+        margin-bottom: 25px;
+        color: #80521e;
+        font-size: 13px;
+    }
+
+    @media(max-width: 600px) {
+        .article-detail-page {
+            padding: 40px 18px 65px;
+        }
+
+        .article-detail-title {
+            letter-spacing: -1px;
+        }
+
+        .article-detail-excerpt {
+            font-size: 17px;
+        }
+
+        .article-detail-body {
+            font-size: 15px;
+        }
+    }
+</style>
+
+<main class="article-detail-page">
+    <div class="article-detail-container">
+
+        {% if is_preview %}
+            <div class="article-detail-preview">
+                MODE PREVIEW — Artikel ini sedang dilihat melalui Dashboard Admin.
+            </div>
+        {% endif %}
+
+        <a href="{% url 'public_articles' %}" class="article-back">
+            ← Kembali ke Artikel
+        </a>
+
+        <div class="article-detail-category">
+            SOCIALYZE / 
+            {% if article.category %}
+                {{ article.category.name }}
+            {% else %}
+                INSIGHTS & STORIES
+            {% endif %}
+        </div>
+
+        <h1 class="article-detail-title">
+            {{ article.title }}
+        </h1>
+
+        <div class="article-detail-meta">
+            <span>
+                By {{ article.author|default:"Socialyze Team" }}
+            </span>
+
+            <span>
+                {% if article.published_at %}
+                    {{ article.published_at|date:"d F Y" }}
+                {% else %}
+                    {{ article.created_at|date:"d F Y" }}
+                {% endif %}
+            </span>
+        </div>
+
+        {% if article.uploaded_image %}
+            <img
+                src="{{ article.uploaded_image.url }}"
+                alt="{{ article.title }}"
+                class="article-detail-image"
+            >
+        {% elif article.image %}
+            <img
+                src="{{ article.image }}"
+                alt="{{ article.title }}"
+                class="article-detail-image"
+            >
+        {% endif %}
+
+        {% if article.excerpt %}
+            <div class="article-detail-excerpt">
+                {{ article.excerpt }}
+            </div>
+        {% endif %}
+
+        <div class="article-detail-body">
+            {{ article.body|safe }}
+        </div>
+
+        <div class="article-detail-footer">
+            <a href="{% url 'public_articles' %}">
+                ← Lihat Artikel Lainnya
+            </a>
+        </div>
+
+    </div>
+</main>
+
+{% endblock %}

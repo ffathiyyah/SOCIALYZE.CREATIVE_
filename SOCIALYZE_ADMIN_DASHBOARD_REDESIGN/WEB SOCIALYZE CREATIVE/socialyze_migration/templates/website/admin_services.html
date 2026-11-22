@@ -1,0 +1,358 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Layanan — Socialyze</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 35px;
+            font-family: 'Space Grotesk', sans-serif;
+            background: #f7f0d2;
+            color: #430709;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+        }
+
+        h2 {
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .muted {
+            color: #806b62;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 18px;
+            background: #6b0b0d;
+            color: white;
+            text-decoration: none;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .button:hover {
+            background: #430709;
+        }
+
+        .panel {
+            background: #fff8ca;
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid #e4d8a9;
+            margin-bottom: 25px;
+        }
+
+        .count {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 850px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 10px;
+            border-bottom: 1px solid #e4d8a9;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        th {
+            font-family: 'DM Mono', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+
+        .service-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: #e9dfbd;
+            font-size: 20px;
+        }
+
+        .service-name {
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .service-description {
+            color: #806b62;
+            max-width: 330px;
+            line-height: 1.5;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .status.active {
+            background: #e3edcf;
+            color: #31502b;
+        }
+
+        .status.inactive {
+            background: #f4dddd;
+            color: #8a1717;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .edit-button,
+        .delete-button {
+            padding: 8px 12px;
+            border: 0;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .edit-button {
+            background: #6b0b0d;
+        }
+
+        .delete-button {
+            background: #8a1717;
+        }
+
+        .edit-button:hover,
+        .delete-button:hover {
+            background: #430709;
+        }
+
+        .message {
+            padding: 13px 16px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+            background: #e8efd8;
+            color: #31502b;
+        }
+
+        .message.error {
+            background: #f8dddd;
+            color: #8a1717;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #806b62;
+        }
+
+        @media(max-width: 650px) {
+            body {
+                padding: 18px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            .panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1>Kelola Layanan</h1>
+            <p class="muted">
+                Kelola layanan yang ditampilkan pada website Socialyze Creative.
+            </p>
+        </div>
+
+        <div class="actions">
+            <a href="{% url 'dashboard' %}" class="button">
+                ← Kembali ke Dashboard
+            </a>
+
+            <a href="{% url 'admin_service_create' %}" class="button">
+                + Tambah Layanan
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message {% if message.tags == 'error' %}error{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="panel">
+
+        <div class="count">
+            Total Layanan: {{ total_services }}
+        </div>
+
+        <h2>Daftar Layanan</h2>
+
+        <p class="muted" style="margin-bottom: 18px;">
+            Layanan aktif dapat ditampilkan pada halaman utama website.
+        </p>
+
+        <div class="table-wrap">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>IKON</th>
+                        <th>NAMA & DESKRIPSI</th>
+                        <th>KATEGORI</th>
+                        <th>STATUS</th>
+                        <th>URUTAN</th>
+                        <th>AKSI</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for service in services %}
+                    <tr>
+
+                        <td>
+                            <span class="service-icon">
+                                {{ service.icon|default:"✳" }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="service-name">
+                                {{ service.name }}
+                            </div>
+
+                            <div class="service-description">
+                                {{ service.description|truncatechars:150 }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ service.category_label }}
+                        </td>
+
+                        <td>
+                            {% if service.is_active %}
+                                <span class="status active">
+                                    Aktif
+                                </span>
+                            {% else %}
+                                <span class="status inactive">
+                                    Nonaktif
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ service.display_order }}
+                        </td>
+
+                        <td>
+                            <div class="actions">
+
+                                <a
+                                    href="{% url 'admin_service_edit' service.id %}"
+                                    class="edit-button">
+                                    Edit
+                                </a>
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'admin_service_delete' service.id %}"
+                                    onsubmit="return confirm('Yakin ingin menghapus layanan ini?');">
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="delete-button">
+                                        Hapus
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty">
+                            Belum ada layanan.
+                            Silakan tambahkan layanan pertama.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+</div>
+</body>
+</html>
